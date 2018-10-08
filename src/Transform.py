@@ -11,6 +11,8 @@ import getpass
 import pandas as pd
 from inspect import signature
 from qpython import qconnection
+from boto.s3.connection import S3Connection
+
 
 
 #Creating Spark, SQL and Flint contexts:
@@ -21,10 +23,25 @@ flintContext = FlintContext(sqlContext)
 #Reading dataframes
 #Automate this using boto
 date = '10-5-2018'
+
 #Reading files manually:
 stocks = ['ABT', 'AOS', 'ATVI', 'ABBV']
 bucket_name = 's3a://insightde2018bucket/'
 folder_name = bucket_name + date + '/'
+
+#Connecting to S3
+conn = S3Connection()
+conn = boto.connect_s3(AWS_ACCESS_KEY_ID,
+        AWS_SECRET_ACCESS_KEY)
+
+#Accessing bucket
+bucket_name = "insightde2018bucket"
+bucket = s3_connection.get_bucket('bucket_name')
+
+#Getting contents of bucket
+bucket.download_file('industry-comp.csv', '/tmp/hello.txt')
+df = pd.read_csv('./tmp/industry-comp.csv')
+
 #Creating reference table:
 stock = stocks[0]
 all_returns = spark.read.option('header', True).option('inferSchema', True).csv(folder_name + stock + '.csv'). \
@@ -54,20 +71,6 @@ corr = all_returns.summarize(summarizers.correlation(stocks[0], other = stocks[1
 #jdbcDatabase = ""
 #jdbcPort = 5432
 #jdbcUrl = "jdbc:mysql://{0}:{1}/{2}?".format(jdbcHostname, jdbcPort, jdbcDatabase)
-'''
-curs = conn.cursor()
-curs.execute('create table CUSTOMER'\
-              '("CUST_ID" INTEGER not null,'\
-              ' "NAME" VARCHAR not null,'\
-              ' primary key ("CUST_ID"))'\
-             )
-curs.execute("insert into CUSTOMER values (1, 'John')")
-curs.execute("select * from CUSTOMER")
-print(curs.fetchall())
-curs.close()
-
-conn.close()
-'''
 #with qconnection.QConnection(host = '10.0.0.10', port = 5001, pandas = True) as q:
 #    q.sync('{table1::x}',corr)
 
@@ -75,7 +78,6 @@ conn.close()
 #filename1 = '/home/ubuntu/' + date + '.parquet'
 
 
-#fname = 'hdfs://ec2-52-204-67-201.compute-1.amazonaws.com:9000/user/hdfs/folder/file.csv'
 f2 = '/usr/local/hadoop/hadoop_data/hdfs/namenode/tempo.parquet'
 filename = '/user/{}/filename.parquet'.format(getpass.getuser())
 
@@ -84,7 +86,6 @@ filename = '/user/{}/filename.parquet'.format(getpass.getuser())
 #myschema = ["time"].append(stocks)
 #ar = spark.createDataFrame(all_returns, schema = myschema)
 #df = pd.DataFrame(all_returns)
-#df.to_csv("fucking.csv")
 #all_returns.write.parquet(f2)
 print(dir(all_returns))
 pdf = all_returns.toPandas()
