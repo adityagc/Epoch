@@ -1,6 +1,0 @@
-from qpython import qconnection
-import pandas as pd
-
-df = pd.DataFrame({'sym':['abc','def','ghi'],'price':[10.1,10.2,10.3]})
-with qconnection.QConnection(host = '10.0.0.10', port = 5001, pandas = True) as q:
-    q.sync('{table1::x}',df)
