@@ -9,5 +9,5 @@ This repository contains my project for the Insight Data Engineering program.
 
 # Pipeline:
 <p align="center">
-<img src="https://github.com/adityagc/Epoch/docs/pipeline.png" width="700", height="400">
+<img src="https://github.com/adityagc/Epoch/blob/master/docs/pipeline.png" width="700", height="400">
 </p>
