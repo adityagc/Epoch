@@ -1,13 +1,16 @@
-# Insight-DE-Project
-This repository contains my project for the Insight Data Engineering program.
+# Epoch:
+Epoch is a scalable data pipeline that is optimized for processing time-series data. This was my project for the Insight Data Engineering fellowship program, New York, 2018.
 
-# Instructions for running:
+# Dependencies:
 
-* Create a config.py file in the src folder with AlphaVantage API keys.
-* The format for storing the keys is as follows: ALPHA_KEY=<your key here>
-* Run the Collector.py script in Python 2.7 to extract intra-day data from http://alphavantage.co.
+* [Pegasus](https://github.com/InsightDataScience/pegasus)
+* [Flint](https://github.com/twosigma/flint)
+* [KDB+ database (32-bit recommended, 64-bit would work too)](https://kx.com/connect-with-us/download/)
+* An API key from [Alphavantage](https://www.alphavantage.co/)
 
-# Pipeline:
+# Data Pipeline:
 <p align="center">
 <img src="https://github.com/adityagc/Epoch/blob/master/docs/pipeline.png" width="700", height="200">
 </p>
+
+#
