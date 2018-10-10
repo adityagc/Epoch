@@ -3,8 +3,8 @@ Epoch is a scalable data pipeline that is optimized for processing time-series d
 
 # Dependencies:
 
-* [Pegasus](https://github.com/InsightDataScience/pegasus)
-* [Flint](https://github.com/twosigma/flint)
+* [Pegasus](https://github.com/InsightDataScience/pegasus) An automated tool for provisioning and deployment of AWS EC2 instances. 
+* [Flint](https://github.com/twosigma/flint) - Two Sigma's implementation of highly optimized time series operations in Spark
 * [KDB+ database (32-bit recommended, 64-bit would work too)](https://kx.com/connect-with-us/download/)
 * An API key from [Alphavantage](https://www.alphavantage.co/)
 
