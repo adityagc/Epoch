@@ -75,7 +75,6 @@ conn.close()
 #filename1 = '/home/ubuntu/' + date + '.parquet'
 
 
-#fname = 'hdfs://ec2-52-204-67-201.compute-1.amazonaws.com:9000/user/hdfs/folder/file.csv'
 f2 = '/usr/local/hadoop/hadoop_data/hdfs/namenode/tempo.parquet'
 filename = '/user/{}/filename.parquet'.format(getpass.getuser())
 
@@ -84,7 +83,6 @@ filename = '/user/{}/filename.parquet'.format(getpass.getuser())
 #myschema = ["time"].append(stocks)
 #ar = spark.createDataFrame(all_returns, schema = myschema)
 #df = pd.DataFrame(all_returns)
-#df.to_csv("fucking.csv")
 #all_returns.write.parquet(f2)
 print(dir(all_returns))
 pdf = all_returns.toPandas()
