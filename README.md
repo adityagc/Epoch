@@ -1,6 +1,9 @@
 # Epoch:
 Epoch is a scalable data pipeline that is optimized for processing time-series data. This was my project for the Insight Data Engineering fellowship program, New York, 2018.
 
+# Presentation:
+[Epoch](https://docs.google.com/presentation/d/1GSxARQAmEDyiTukdNtsr32hIZ41pp8xLnjljeRZlmmA/edit?usp=sharing)
+
 # Dependencies:
 
 * [Pegasus](https://github.com/InsightDataScience/pegasus) An automated tool for provisioning and deployment of AWS EC2 instances. 

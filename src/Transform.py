@@ -14,11 +14,12 @@ from qpython import qconnection
 
 
 #Creating Spark, SQL and Flint contexts:
-spark = SparkSession.builder.appName("ts").getOrCreate()
-sqlContext = SQLContext(spark)
-flintContext = FlintContext(sqlContext)
-q = qconnection.QConnection(host = '10.0.0.10', port = 5001, pandas = True)
-q.open()
+def Connect(q_connection):
+	spark = SparkSession.builder.appName("ts").getOrCreate()
+	sqlContext = SQLContext(spark)
+	flintContext = FlintContext(sqlContext)
+	q = qconnection.QConnection(host = '10.0.0.10', port = 5001, pandas = True)
+	q.open()
 
 #Reading dataframes
 #Automate this using boto
@@ -49,6 +50,7 @@ for stock in stocks:
 print(all_returns.show())
 all_returns.fillna(0)
 
+<<<<<<< HEAD
 #Sync all_returns table:
 q.sync('{returns::x}',all_returns.toPandas())
 
@@ -60,5 +62,23 @@ for stock in stocks:
 	query = "{" + stock + "::x}"
 	print(query)
 	q.sync(query,corr.toPandas())
+=======
+f2 = '/usr/local/hadoop/hadoop_data/hdfs/namenode/tempo.parquet'
+filename = '/user/{}/filename.parquet'.format(getpass.getuser())
+
+# self.data_stats.toDF(schema=["time"].append(stocks).write.format("org.apache.spark.sql.cassandra").mode("append").options(table=self.cassandra_table, keyspace=self.cassandra_keyspace).save()
+
+#myschema = ["time"].append(stocks)
+#ar = spark.createDataFrame(all_returns, schema = myschema)
+#df = pd.DataFrame(all_returns)
+#all_returns.write.parquet(f2)
+print(dir(all_returns))
+pdf = all_returns.toPandas()
+print(pdf.head())
+
+
+with qconnection.QConnection(host = '10.0.0.10', port = 5001, pandas = True) as q:
+    q.sync('{table2::x}',pdf)
+>>>>>>> 7aca1a810757d38c30f52145f2e26e35066ff39b
 
 
