@@ -17,8 +17,8 @@ app.layout = html.Div(children=[
     '''),
     dcc.Input(id='input', value='', type='text'),
 	html.Div(id='returns-graph'),
-	html.Div(id='correlations-graph'),
-], style={'width': '49%', 'display': 'inline-block', 'vertical-align': 'middle'})
+	#html.Div(id='correlations-graph'),
+])
 
 #Callback for stock return chart
 @app.callback(
@@ -37,14 +37,12 @@ def update_value(input_data):
 	#print(df.head())
 	return dcc.Graph(
 	id='example-graph',
-   	figure={'data': [{'x': df['time'], 'y': df[input_data], 'type': 'line', 'name': input_data},],
-	'layout': {'height': 400,'margin': {'l': 10, 'b': 20, 't': 0, 'r': 0}}
-	})
+   	figure={'data': [{'x': [0.8, -0.5, 0.3], 'y': ["AOS", "ATVI", "ABBV" ] , 'type': 'bar', 'name': input_data},],'layout': {'title': input_data}})
 	#except:
 	#	print("An error occurred while trying to get data from dataframe")
 	#	return None
 
-
+"""
 #Callback for correlations chart
 @app.callback(
     Output(component_id='correlations-graph', component_property='children'),
@@ -55,17 +53,18 @@ def update_value(input_data):
     if (not input_data in stock_list):
         print("Sorry, stock ", input_data,  " does not exist in our database")
         return None
-    #table_name = "returns"
-    #query = "select time, " + input_data + " from " + table_name
+    table_name = "returns"
+    query = "select time, " + input_data + " from " + table_name
     #print(query)
-    #df = q.sync(query)
+    df = q.sync(query)
     #print(df.head())
     return dcc.Graph(
     id='example-graph',
-    figure={'data': [{'x': [1,2,3], 'y': [4,5,6], 'type': 'line', 'name': input_data},],'layout': {'height': 400,'margin': {'l': 10, 'b': 20, 't': 0, 'r': 0}}})
+    figure={'data': [{'x': df['time'], 'y': df[input_data], 'type': 'line', 'name': input_data},],'layout': {'title': input_data}})
+    #except:
     #   print("An error occurred while trying to get data from dataframe")
     #   return None
-
+"""
 
 if __name__ == '__main__':
 	try:
