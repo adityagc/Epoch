@@ -12,73 +12,67 @@ import pandas as pd
 from inspect import signature
 from qpython import qconnection
 
+#Global definitions
+qhost = '10.0.0.10'
+qport = 5001
+bucket_name = 's3a://insighttmpbucket1/'
+index_name = bucket_name + 'index.txt'
+
+#Getting list of all stocks:
+def get_stock_list(index):
+    df = pd.read_csv(index, names=["tickers"])
+    return df["tickers"].tolist()
+
 
 #Creating Spark, SQL and Flint contexts:
-def Connect(q_connection):
+def connect(q_host, q_port):
 	spark = SparkSession.builder.appName("ts").getOrCreate()
 	sqlContext = SQLContext(spark)
-	flintContext = FlintContext(sqlContext)
-	q = qconnection.QConnection(host = '10.0.0.10', port = 5001, pandas = True)
+	fc = FlintContext(sqlContext)
+	q = qconnection.QConnection(host = q_host, port = q_port, pandas = True)
 	q.open()
+	return q, fc
 
-#Reading dataframes
-#Automate this using boto
-date = '10-5-2018'
-#Reading files manually:
-stocks = ['ABT', 'AOS', 'ATVI', 'ABBV']
-bucket_name = 's3a://insightde2018bucket/'
-folder_name = bucket_name + date + '/'
+
 #Creating reference table:
-stock = stocks[0]
-all_returns = spark.read.option('header', True).option('inferSchema', True).csv(folder_name + stock + '.csv'). \
+def get_reference_table(bucket):
+	stock = stocks[0]
+	all_returns = spark.read.option('header', True).option('inferSchema', True).csv(folder_name + stock + '.csv'). \
     withColumnRenamed('date', 'time').withColumnRenamed('1. open', 'open').withColumnRenamed('4. close', 'close'). \
     withColumnRenamed('2. high', 'high').withColumnRenamed('3. low', 'low').withColumnRenamed('5. volume', 'volume')
-all_returns = flintContext.read.dataframe(all_returns)
-all_returns = all_returns.select('time')
-print(all_returns.show())
+	all_returns = flintContext.read.dataframe(all_returns)
+	all_returns = all_returns.select('time')
+	return all_returns
 
 #Iterating through all stocks:
-for stock in stocks:
-	flint_stock = spark.read.option('header', True).option('inferSchema', True).csv(folder_name + stock + '.csv'). \
-	withColumnRenamed('date', 'time').withColumnRenamed('1. open', 'open').withColumnRenamed('4. close', 'close'). \
-	withColumnRenamed('2. high', 'high').withColumnRenamed('3. low', 'low').withColumnRenamed('5. volume', 'volume')
-	flint_stock = flintContext.read.dataframe(flint_stock)
-	stock_return = flint_stock.withColumn( stock , 100 * (flint_stock['close'] - flint_stock['open']) / flint_stock['open']).select('time', stock)
-	all_returns = all_returns.futureLeftJoin(stock_return, key='time', tolerance = '120s')
+def merge_rdds(stocklist, reference_table):
+	for stock in stocks:
+		flint_stock = spark.read.option('header', True).option('inferSchema', True).csv(folder_name + stock + '.csv'). \
+		withColumnRenamed('date', 'time').withColumnRenamed('1. open', 'open').withColumnRenamed('4. close', 'close'). \
+		withColumnRenamed('2. high', 'high').withColumnRenamed('3. low', 'low').withColumnRenamed('5. volume', 'volume')
+		flint_stock = flintContext.read.dataframe(flint_stock)
+		stock_return = flint_stock.withColumn( stock , 100 * (flint_stock['close'] - flint_stock['open']) / flint_stock['open']).select('time', stock)
+		all_returns = all_returns.futureLeftJoin(stock_return, key='time', tolerance = '120s')
+	return all_returns
 
 #Display table for reference:
-print(all_returns.show())
 all_returns.fillna(0)
 
-<<<<<<< HEAD
 #Sync all_returns table:
 q.sync('{returns::x}',all_returns.toPandas())
 
 #Summarizing correlation coefficients:
-for stock in stocks:
-	current = [stock]
-	excluding = list(filter(lambda stock: stock  not in current, stocks))
-	corr = all_returns.summarize(summarizers.correlation(stock, other = excluding))
-	query = "{" + stock + "::x}"
-	print(query)
-	q.sync(query,corr.toPandas())
-=======
-f2 = '/usr/local/hadoop/hadoop_data/hdfs/namenode/tempo.parquet'
-filename = '/user/{}/filename.parquet'.format(getpass.getuser())
+def get_correlations(stocklist, returns):
+	for stock in stocks:
+		current = [stock]
+		excluding = list(filter(lambda stock: stock  not in current, stocks))
+		corr = all_returns.summarize(summarizers.correlation(stock, other = excluding))
+		query = "{" + stock + "::x}"
+		print(query)
+		q.sync(query,corr.toPandas())
 
-# self.data_stats.toDF(schema=["time"].append(stocks).write.format("org.apache.spark.sql.cassandra").mode("append").options(table=self.cassandra_table, keyspace=self.cassandra_keyspace).save()
+def push_to_kdb(rdd, qcontext, stockname):
+	pandas_df = returns.toPandas()
 
-#myschema = ["time"].append(stocks)
-#ar = spark.createDataFrame(all_returns, schema = myschema)
-#df = pd.DataFrame(all_returns)
-#all_returns.write.parquet(f2)
-print(dir(all_returns))
-pdf = all_returns.toPandas()
-print(pdf.head())
-
-
-with qconnection.QConnection(host = '10.0.0.10', port = 5001, pandas = True) as q:
-    q.sync('{table2::x}',pdf)
->>>>>>> 7aca1a810757d38c30f52145f2e26e35066ff39b
-
+   	q.sync('{::x}',pdf)
 
