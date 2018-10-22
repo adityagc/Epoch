@@ -23,6 +23,7 @@ app.layout = html.Div(children=[
     '''),
     dcc.Input(id='input', value='', type='text'),
 	html.Div(id='returns-graph'),
+	html.Div(id='ret-graph')
 ]) #, style={'width': '80%', 'display': 'inline-block', 'vertical-align': 'middle'})
 
 #Callback for stock return chart
@@ -41,8 +42,28 @@ def update_value(input_data):
 	return dcc.Graph(
 	id='example-graph',
    	figure={'data': [{'x': df['time'], 'y': df['close'], 'type': 'line', 'name': stock},],
-	'layout': {'height': 400,'margin': {'l': 10, 'b': 20, 't': 0, 'r': 0}}
+	#'layout': {'height': 400,'margin': {'l': 10, 'b': 20, 't': 0, 'r': 0}}
 	})
+
+#Callback for stock return chart
+@app.callback(
+    Output(component_id='ret-graph', component_property='children'),
+    [Input(component_id='input', component_property='value')]
+)
+def update_value(input_data):
+    stock = input_data.upper()
+    stock_key = "a_" + stock + ".csv"
+    if (stock_key not in stock_list):
+        print("Sorry, stock ", stock,  " does not exist in our returns database")
+        return None
+    query = "select time, close from " + stock
+    df = q.sync(query)
+    return dcc.Graph(
+    id='ret-graph',
+    figure={'data': [{'x': df['time'], 'y': df['close'], 'type': 'line', 'name': stock},],
+    'layout': {'height': 400,'margin': {'l': 10, 'b': 20, 't': 0, 'r': 0}}
+    })
+
 
 
 if __name__ == '__main__':
