@@ -12,12 +12,6 @@ import pandas as pd
 from inspect import signature
 from qpython import qconnection
 
-#Global definitions
-qhost = '10.0.0.10'
-qport = 5001
-bucket_name = 's3a://insighttmpbucket1/'
-index_name = bucket_name + 'index.txt'
-
 #Getting list of all stocks:
 def get_stock_list(index):
     df = pd.read_csv(index, names=["tickers"])
@@ -31,7 +25,7 @@ def connect(q_host, q_port):
 	fc = FlintContext(sqlContext)
 	q = qconnection.QConnection(host = q_host, port = q_port, pandas = True)
 	q.open()
-	return q, fc
+	return q, fc, spark
 
 
 #Creating reference table:
@@ -68,8 +62,17 @@ def get_correlations(stocklist, returns):
 
 #Push to kdb
 def push_to_kdb(rdd, qcontext, stockname):
-	query = "{" + stock + "::x}"
-	print(query)
-	q.sync(query,corr.toPandas())
-	pandas_df = returns.toPandas()
-   	q.sync('{::x}',pdf)
+	#query = str(stockname[:-4 or None]) + "::" + rdd.toPandas()
+	#print(query)
+	#qcontext.sync('{y :: x}', str(stockname[:-4 or None]), rdd.toPandas())
+	pdf = rdd.toPandas()
+	query = "{" + str(stockname[:-4 or None]) + "::x}"
+	qcontext.sync(query,pdf)
+def push_raw_table(qcon, sparkcontext, flintcon, bucketname, stocklist):
+	for stock in stocklist:
+		stock_rdd = sparkcontext.read.option('header', True).option('inferSchema', True).csv(bucketname + stock).withColumnRenamed('date', 'time')
+		ts_rdd = flintcon.read.dataframe(stock_rdd)
+		print(ts_rdd.show())
+		#close_rdd = ts_rdd['close']
+		push_to_kdb(ts_rdd, qcon, stock)
+
