@@ -53,13 +53,8 @@ def merge_rdds(stocklist, reference_table):
 		flint_stock = flintContext.read.dataframe(flint_stock)
 		stock_return = flint_stock.withColumn( stock , 100 * (flint_stock['close'] - flint_stock['open']) / flint_stock['open']).select('time', stock)
 		all_returns = all_returns.futureLeftJoin(stock_return, key='time', tolerance = '120s')
+	#fillna if needed
 	return all_returns
-
-#Display table for reference:
-all_returns.fillna(0)
-
-#Sync all_returns table:
-q.sync('{returns::x}',all_returns.toPandas())
 
 #Summarizing correlation coefficients:
 def get_correlations(stocklist, returns):
@@ -71,8 +66,10 @@ def get_correlations(stocklist, returns):
 		print(query)
 		q.sync(query,corr.toPandas())
 
+#Push to kdb
 def push_to_kdb(rdd, qcontext, stockname):
+	query = "{" + stock + "::x}"
+	print(query)
+	q.sync(query,corr.toPandas())
 	pandas_df = returns.toPandas()
-
    	q.sync('{::x}',pdf)
-
