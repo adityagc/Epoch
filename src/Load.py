@@ -19,7 +19,7 @@ app.config['suppress_callback_exceptions'] = True
 
 app.layout = html.Div(children=[
     html.Div(children='''
-        Symbol to graph:
+        Input ticker:
     '''),
     dcc.Input(id='input', value='', type='text'),
 	html.Div(id='returns-graph'),
