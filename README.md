@@ -2,7 +2,7 @@
 Epoch is a scalable data pipeline that is optimized for processing time-series data. This was my project for the Insight Data Engineering fellowship program, New York, 2018.
 
 # Presentation:
-[Epoch](https://docs.google.com/presentation/d/1GSxARQAmEDyiTukdNtsr32hIZ41pp8xLnjljeRZlmmA/edit?usp=sharing)
+[Epoch](https://docs.google.com/presentation/d/1izoRALxP4UF0oE_kzd2NjfqmfU9f6gmBa9m6c1oqYJo/edit?usp=sharing)
 
 # Dependencies:
 
