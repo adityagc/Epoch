@@ -1,4 +1,5 @@
 import ts.flint
+import numpy as np
 from ts.flint import FlintContext
 from pyspark import SparkContext
 from pyspark import SQLContext
@@ -11,7 +12,7 @@ import getpass
 import pandas as pd
 from inspect import signature
 from qpython import qconnection
-
+import math
 #Getting list of all stocks:
 def get_stock_list(index):
     df = pd.read_csv(index, names=["tickers"])
@@ -70,21 +71,22 @@ def push_to_kdb(rdd, qcontext, stockname):
 	qcontext.sync(query,pdf)
 
 def push_raw_table(qcon, sparkcontext, flintcon, bucketname, stocklist):
-	for stock in stocklist:
+	for stock in stocklist[0:4]:
 		stock_rdd = sparkcontext.read.option('header', True).option('inferSchema', True).csv(bucketname + stock).withColumnRenamed('date', 'time')
 		ts_rdd = flintcon.read.dataframe(stock_rdd)
-		print(ts_rdd.show())
-		#close_rdd = ts_rdd['close']
-		push_to_kdb(ts_rdd, qcon, stock)
+		print(ts_rdd.selectshow())
+		#push_to_kdb(ts_rdd, qcon, stock)
 
 def get_returns(rdd,  stockname):
-	returnsrdd = rdd.withColumn('open', 100 * (rdd['close']-rdd['open']) / rdd['open']).select('time', 'open')
+	returnsrdd = rdd.withColumn('returns', 100 * ((rdd['close']-rdd['open']) / rdd['open'])).select('time', 'returns')
 	return returnsrdd
 
 def push_returns(qcon, sparkcontext, flintcon, bucketname, stocklist):
 	for stock in stocklist[0:4]:
 		stock_rdd = sparkcontext.read.option('header', True).option('inferSchema', True).csv(bucketname + stock).withColumnRenamed('date', 'time')
 		ts_rdd = flintcon.read.dataframe(stock_rdd)
+		close_rdd = ts_rdd.select('time','close')
+		print(close_rdd.show())
 		returns_rdd = get_returns(ts_rdd, stock)
 		print(returns_rdd.show())
-		push_to_kdb(returns_rdd, qcon, "a_" + stock)
+		#push_to_kdb(returns_rdd, qcon, "a_" + stock)

@@ -1,4 +1,4 @@
-from spark.Transform import *
+from Transform.Transform import *
 
 qhost = '10.0.0.10'
 qport = 5100
