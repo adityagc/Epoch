@@ -14,7 +14,7 @@ Epoch is a scalable data pipeline that is optimized for processing time-series d
 
 # Data Pipeline:
 <p align="center">
-<img src="https://github.com/adityagc/Epoch/blob/master/docs/pipeline.png" width="700", height="200">
+<img src="https://github.com/adityagc/Epoch/blob/master/docs/newpipeline.png" width="700", height="200">
 </p>
 
 #
