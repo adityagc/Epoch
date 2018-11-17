@@ -10,6 +10,7 @@ Epoch is a scalable data pipeline that is optimized for processing time-series d
 * [Flint](https://github.com/twosigma/flint) - Two Sigma's implementation of highly optimized time series operations in Spark
 * [KDB+ database (32-bit recommended, 64-bit would work too)](https://kx.com/connect-with-us/download/)
 * An API key from [Alphavantage](https://www.alphavantage.co/)
+* An API key from [Quandl](https://www.quandl.com/)
 
 # Data Pipeline:
 <p align="center">
